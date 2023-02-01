@@ -1,0 +1,63 @@
+camunda.bpm.admin-user:
+  id: demo
+  password: demo
+
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@10.30.0.58:1521:xe
+    username: ATZOTA
+    password: ATZOTA
+    connectionFactoryClassName: oracle.jdbc.pool.OracleDataSource
+    connectionWaitTimeout: 10
+    inactiveConnectionTimeout: 10
+    initialPoolSize: 10
+
+
+    validateConnectionOnBorrow: true
+  jpa:
+    generate-ddl: false
+    database-platform: org.hibernate.dialect.Oracle12gDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle12gDialect
+        format_sql: false
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+
+
+process:
+  xsdLocation: src/main/resources/core/xsd/UBL-Invoice-2.1.xsd
+  enRulesLocation: /Users\YHamed\Desktop\AgileFolder\camundaP-processes\src\main\resources\core\en\CEN-EN16931-UBL.xsl
+  ksaRulesLocation: /Users\YHamed\Desktop\AgileFolder\camundaP-processes\src\main\resources\core\ksa\20210819_ZATCA_E-invoice_Validation_Rules.xsl
+publisherUrl: https://stzgw-apic-gov.gazt.gov.sa/e-invoicing/coreinv/kafka/publisher/invoices/publish
+publisherPihUrl: https://stzgw-apic-gov.gazt.gov.sa/e-invoicing/coreinv/kafka/publisher/invoices/publishPIH
+clearanceStatusUrl: https://stzgw-apic-gov.gazt.gov.sa/e-invoicing/admin/getMetaData
+clearanceStatusByVatUrl: https://stzgw-apic-gov.gazt.gov.sa/e-invoicing/admin/adminConfig/api/lookups/v1/findByNameAndValue
+businessRulesNameURL:  https://stzgw-apic-gov.gazt.gov.sa/e-invoicing/admin/adminConfig/api/lookups/v1/search/getErrorMessageByCode
+compliance:
+  checks:
+    url: http://localhost:8011/core/csids/compliance/checks
+zatca:
+  signing:
+    private:
+      key: MHQCAQEEIPkmj0OfzMSx2ac4OwoFH8BKweT6EhLwSkQpK+m9yq+moAcGBSuBBAAKoUQDQgAER2J+N0nTdvf4zR1M+h9kJF8Er7wZ1uyeHDhM2YSppwcZO2tI1ptrdRWvNqY7LuFZkvaBQVD3Y25jB4bGGiK5jg==
+    certificate: MIIB7DCCAZGgAwIBAgIGAX4qLf5RMAoGCCqGSM49BAMCMBUxEzARBgNVBAMMCmVJbnZvaWNpbmcwHhcNMjIwMTA1MTIxOTE5WhcNMjcwMTA0MjIwMDAwWjBOMQswCQYDVQQGEwJTQTEVMBMGA1UECwwMUnlpYWQgQnJhbmNoMQ4wDAYDVQQKDAVKZXJpcjEYMBYGA1UEAwwPMTIzNDU0MzIxMjEzMjM0MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAER2J+N0nTdvf4zR1M+h9kJF8Er7wZ1uyeHDhM2YSppwcZO2tI1ptrdRWvNqY7LuFZkvaBQVD3Y25jB4bGGiK5jqOBljCBkzAMBgNVHRMBAf8EAjAAMIGCBgNVHREEezB5pHcwdTEeMBwGA1UEBAwVMzM0MTMzMTMzMjMzMzMyMTIxMjAwMR8wHQYKCZImiZPyLGQBAQwPMzEwMTIyMzkzNTAwMDAzMQ0wCwYDVQQMDAQxMTAwMRIwEAYDVQQaDAlBZGRyZXNzZXMxDzANBgNVBA8MBlJldGFpbDAKBggqhkjOPQQDAgNJADBGAiEA/1gVN3gzxVkTn1Deiw7t1txwRWW9x0H/k4VbmpbQK08CIQC1zVWM6j5PDSZCaEaItr/XkW0kaixsemvVAipmz/K2zw==
+certificate:
+  authentication:
+    url: http://localhost:8011/core/csids/auth
+    v2:
+      url: http://localhost:8012/core/auth/
+admin:
+  url: http://localhost:8899/adminConfig/api/lookups/v1/lookupByCodeAndDepth?depth=%s&lookupCode=%s
+
+OTP_VALIDITY: 60000.0
+
+
+
+
