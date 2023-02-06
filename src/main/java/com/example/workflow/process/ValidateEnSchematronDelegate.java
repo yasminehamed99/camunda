@@ -19,11 +19,16 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.zip.InflaterInputStream;
 
 import static com.example.workflow.validation.ValidationStatus.ERROR;
 
@@ -31,6 +36,20 @@ import static com.example.workflow.validation.ValidationStatus.ERROR;
 public class ValidateEnSchematronDelegate implements JavaDelegate {
     private final Logger LOGGER = Logger.getLogger(ValidateEnSchematronDelegate.class.getName());
     Map<String, ValidationResultsImpl> errorAndWarResults = new HashMap<>();
+    String value=null;
+    public static String decompress(byte[] bytes) {
+        InputStream in = new InflaterInputStream(new ByteArrayInputStream(bytes));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            byte[] buffer = new byte[8192];
+            int len;
+            while((len = in.read(buffer))>0)
+                baos.write(buffer, 0, len);
+            return new String(baos.toByteArray(), "UTF-8");
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+    }
 
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
@@ -42,7 +61,17 @@ public class ValidateEnSchematronDelegate implements JavaDelegate {
             String businessRulesName = "EN_16931";
             String language = "en";
 
-            String invoice = (String) delegateExecution.getVariable("decoded-invoice");
+           String invoice="";
+            value="";
+            for(int i=0;i<10;i++) {
+                value += delegateExecution.getVariable("input" +( i + 1));
+            }
+
+            byte[] toBeDecompressed = Base64.getDecoder().decode(value);
+
+            String invoiceEncoded = decompress(toBeDecompressed);
+            LOGGER.info(invoice);
+            invoice = new String(Base64.getDecoder().decode(invoiceEncoded));
             String schema = (String) delegateExecution.getVariable("en-rules");
 
             ENXsltTransformerSingleton.setSchematronFile(Path.of(schema));

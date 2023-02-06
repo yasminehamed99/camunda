@@ -11,21 +11,50 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.zip.InflaterInputStream;
+
 @Component
 public class XsdValidatorDelegate implements JavaDelegate {
     private final Logger LOGGER = Logger.getLogger(XsdValidatorDelegate.class.getName());
     public String invoice=null;
     public String   xsdFile=null;
+    String value=null;
+    public static String decompress(byte[] bytes) {
+        InputStream in = new InflaterInputStream(new ByteArrayInputStream(bytes));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            byte[] buffer = new byte[8192];
+            int len;
+            while((len = in.read(buffer))>0)
+                baos.write(buffer, 0, len);
+            return new String(baos.toByteArray(), "UTF-8");
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+    }
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
         ValidationResultsImpl results = new ValidationResultsImpl();
         ByteArrayInputStream byteArray = null;
 
         try {
-            invoice = (String) delegateExecution.getVariable("decoded-invoice");
+            String invoice="";
+            value="";
+            for(int i=0;i<10;i++) {
+                value += delegateExecution.getVariable("input" +( i + 1));
+            }
+
+            byte[] toBeDecompressed = Base64.getDecoder().decode(value);
+            String invoiceEncoded = decompress(toBeDecompressed);
+            LOGGER.info(invoice);
+            invoice = new String(Base64.getDecoder().decode(invoiceEncoded));
             xsdFile = (String) delegateExecution.getVariable("xsd-file");
             ValidatorSingleton.setXsdFile(Path.of(xsdFile));
             LOGGER.info(Path.of(xsdFile).toString());
